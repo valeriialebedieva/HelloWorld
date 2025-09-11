@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class ToDoListApp {
@@ -44,8 +45,15 @@ public class ToDoListApp {
             System.out.println("9. Exit");
             System.out.print("Choose an option: ");
 
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // consume newline
+            int choice;
+            try {
+                choice = scanner.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("⚠ Invalid input! Please enter a number.");
+                scanner.nextLine(); // clear invalid input
+                continue; // restart menu
+            }
+            scanner.nextLine(); // consume leftover newline
 
             switch (choice) {
                 case 1:
@@ -68,37 +76,30 @@ public class ToDoListApp {
 
                 case 3:
                     System.out.print("Enter task number to mark as completed: ");
-                    int taskNum = scanner.nextInt();
-                    if (taskNum > 0 && taskNum <= tasks.size()) {
+                    int taskNum = getValidNumber(scanner, tasks.size());
+                    if (taskNum != -1) {
                         tasks.get(taskNum - 1).markCompleted();
                         System.out.println("Task marked as completed!");
-                    } else {
-                        System.out.println("Invalid task number.");
                     }
                     break;
 
                 case 4:
                     System.out.print("Enter task number to delete: ");
-                    int deleteNum = scanner.nextInt();
-                    if (deleteNum > 0 && deleteNum <= tasks.size()) {
+                    int deleteNum = getValidNumber(scanner, tasks.size());
+                    if (deleteNum != -1) {
                         tasks.remove(deleteNum - 1);
                         System.out.println("Task deleted!");
-                    } else {
-                        System.out.println("Invalid task number.");
                     }
                     break;
 
                 case 5:
                     System.out.print("Enter task number to edit: ");
-                    int editNum = scanner.nextInt();
-                    scanner.nextLine(); // consume newline
-                    if (editNum > 0 && editNum <= tasks.size()) {
+                    int editNum = getValidNumber(scanner, tasks.size());
+                    if (editNum != -1) {
                         System.out.print("Enter new description: ");
                         String newDesc = scanner.nextLine();
                         tasks.get(editNum - 1).editDescription(newDesc);
                         System.out.println("Task updated!");
-                    } else {
-                        System.out.println("Invalid task number.");
                     }
                     break;
 
@@ -141,5 +142,23 @@ public class ToDoListApp {
                     System.out.println("Invalid option. Try again!");
             }
         }
+    }
+
+    // Helper method to safely read task numbers
+    private static int getValidNumber(Scanner scanner, int max) {
+        int num;
+        try {
+            num = scanner.nextInt();
+        } catch (InputMismatchException e) {
+            System.out.println("⚠ Invalid input! Please enter a number.");
+            scanner.nextLine(); // clear invalid input
+            return -1;
+        }
+        scanner.nextLine(); // consume leftover newline
+        if (num <= 0 || num > max) {
+            System.out.println("⚠ Invalid task number.");
+            return -1;
+        }
+        return num;
     }
 }
