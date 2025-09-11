@@ -1,8 +1,9 @@
+package org.example;
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ToDoListApp {
-    // A class to represent a task
     static class Task {
         String description;
         boolean completed;
